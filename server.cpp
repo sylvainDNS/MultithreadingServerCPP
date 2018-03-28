@@ -3,18 +3,20 @@
 #include <string>
 #include <iostream>
 #include <thread>
+#include <mutex>
+#include <cstdlib>
 
 using namespace std;
 
-void request(ServerSocket new_sock)
+void request(ServerSocket *new_sock)
 {
   try
   {
     while (true)
     {
       string data;
-      new_sock >> data;
-      new_sock << data;
+      new_sock->recv(data);
+      new_sock->send(data);
     }
   }
   catch (SocketException &)
@@ -41,9 +43,9 @@ int main(int argc, char *argv[])
 
     while (true)
     {
-      ServerSocket new_sock;
+      ServerSocket *new_sock = new ServerSocket();
       cout << "Socket created" << endl;
-      server.accept(new_sock);
+      server.accept(*new_sock);
       thread reqThread(request, new_sock);
       reqThread.join();
     }
