@@ -42,8 +42,8 @@ int main(int argc, char *argv[])
     while (true)
     {
       ServerSocket new_sock;
+      cout << "Socket created" << endl;
       server.accept(new_sock);
-      // cout << "Socket created" << endl;
       thread reqThread(request, new_sock);
       reqThread.join();
     }
