@@ -3,12 +3,18 @@
 #include <string>
 #include <iostream>
 #include <thread>
-#include <mutex>
 #include <cstdlib>
+#include <list>
+#include <chrono>
 
 using namespace std;
 
-void request(ServerSocket *new_sock)
+void wait()
+{
+  this_thread::sleep_for(chrono::seconds(1));
+}
+
+void receive(ServerSocket *new_sock)
 {
   try
   {
@@ -16,6 +22,8 @@ void request(ServerSocket *new_sock)
     {
       string data;
       new_sock->recv(data);
+      // cout << "Data received : " << data << endl;
+      wait();
       new_sock->send(data);
     }
   }
@@ -41,12 +49,17 @@ int main(int argc, char *argv[])
   {
     ServerSocket server(port);
 
+    // list<ServerSocket> *sockets;
+
     while (true)
     {
       ServerSocket *new_sock = new ServerSocket();
       cout << "Socket created" << endl;
       server.accept(*new_sock);
-      thread reqThread(request, new_sock);
+
+      thread reqThread(receive, new_sock);
+      // sockets->push_back(*new_sock);
+
       reqThread.join();
     }
   }
